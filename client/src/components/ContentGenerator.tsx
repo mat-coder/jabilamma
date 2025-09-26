@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import Header from './Header';
 import LanguageSelector from './LanguageSelector';
-import ContentTypeSelector from './ContentTypeSelector';
 import ContextForm from './ContextForm';
 import GenerateButton from './GenerateButton';
 import GeneratedContent from './GeneratedContent';
-
-type ContentType = 'lyrics' | 'dialogue';
 
 // TODO: remove mock functionality - replace with real OpenAI integration
 const MOCK_CONTENT = {
@@ -59,12 +56,11 @@ const MOCK_CONTENT = {
 export default function ContentGenerator() {
   const [credits, setCredits] = useState(25);
   const [selectedLanguage, setSelectedLanguage] = useState<string>('');
-  const [contentType, setContentType] = useState<ContentType | undefined>(undefined);
   const [context, setContext] = useState({});
   const [generatedContent, setGeneratedContent] = useState<string>('');
   const [isGenerating, setIsGenerating] = useState(false);
   
-  const canGenerate = Boolean(selectedLanguage && contentType);
+  const canGenerate = Boolean(selectedLanguage);
   const creditsAvailable = credits > 0;
   
   const getLanguageName = (id: string) => {
@@ -84,7 +80,6 @@ export default function ContentGenerator() {
     setIsGenerating(true);
     console.log('Generating content...', {
       language: selectedLanguage,
-      contentType,
       context
     });
     
@@ -92,7 +87,7 @@ export default function ContentGenerator() {
       // TODO: remove mock functionality - replace with real OpenAI API call
       await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate API call
       
-      const mockContent = MOCK_CONTENT[contentType!][selectedLanguage as keyof typeof MOCK_CONTENT.lyrics];
+      const mockContent = MOCK_CONTENT.lyrics[selectedLanguage as keyof typeof MOCK_CONTENT.lyrics];
       setGeneratedContent(mockContent || 'Content generated successfully!');
       setCredits(prev => prev - 1); // Deduct 1 credit
       
@@ -126,28 +121,17 @@ export default function ContentGenerator() {
             />
           </section>
           
-          {/* Content Type Selection */}
+          {/* Context Form */}
           {selectedLanguage && (
             <section>
-              <ContentTypeSelector 
-                selectedType={contentType}
-                onTypeSelect={setContentType}
-              />
-            </section>
-          )}
-          
-          {/* Context Form */}
-          {selectedLanguage && contentType && (
-            <section>
               <ContextForm 
-                contentType={contentType}
                 onContextChange={setContext}
               />
             </section>
           )}
           
           {/* Generate Button */}
-          {selectedLanguage && contentType && (
+          {selectedLanguage && (
             <section>
               <GenerateButton 
                 canGenerate={canGenerate}
@@ -163,7 +147,7 @@ export default function ContentGenerator() {
             <GeneratedContent 
               content={generatedContent}
               language={getLanguageName(selectedLanguage)}
-              contentType={contentType}
+              contentType="lyrics"
               isLoading={isGenerating}
               onRegenerate={handleRegenerate}
             />
