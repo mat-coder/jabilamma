@@ -14,17 +14,18 @@ const SONG_GENRES = ['Classical', 'Folk', 'Bollywood', 'Devotional', 'Sufi', 'Qa
 const MOVIE_GENRES = ['Romance', 'Action', 'Comedy', 'Drama', 'Thriller', 'Family', 'Historical'];
 
 interface ContextFormProps {
+  contentType: ContentType;
   onContextChange: (context: any) => void;
 }
 
-export default function ContextForm({ onContextChange }: ContextFormProps) {
+export default function ContextForm({ contentType, onContextChange }: ContextFormProps) {
   const [selectedMoods, setSelectedMoods] = useState<string[]>([]);
   const [genre, setGenre] = useState('');
   const [theme, setTheme] = useState('');
   const [characters, setCharacters] = useState('');
   const [situation, setSituation] = useState('');
   
-  const genres = SONG_GENRES; // Always use song genres for lyrics
+  const genres = contentType === 'lyrics' ? SONG_GENRES : MOVIE_GENRES;
   
   const addMood = (mood: string) => {
     if (!selectedMoods.includes(mood)) {
@@ -69,7 +70,7 @@ export default function ContextForm({ onContextChange }: ContextFormProps) {
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-semibold text-foreground">Provide Context</h2>
         <p className="text-muted-foreground">
-          Help us understand the mood, style, and theme for your song lyrics
+          Help us understand the mood, style, and theme for your {contentType === 'lyrics' ? 'song lyrics' : 'dialogue'}
         </p>
       </div>
       
@@ -106,7 +107,7 @@ export default function ContextForm({ onContextChange }: ContextFormProps) {
           <Label className="text-sm font-medium">Genre</Label>
           <Select value={genre} onValueChange={(value) => handleInputChange('genre', value)}>
             <SelectTrigger data-testid="select-genre">
-              <SelectValue placeholder="Choose song genre" />
+              <SelectValue placeholder={`Choose ${contentType === 'lyrics' ? 'song' : 'movie'} genre`} />
             </SelectTrigger>
             <SelectContent>
               {genres.map((g) => (
@@ -123,23 +124,41 @@ export default function ContextForm({ onContextChange }: ContextFormProps) {
           </Label>
           <Input
             id="theme"
-            placeholder="e.g., Love, Nature, Celebration"
+            placeholder={contentType === 'lyrics' ? 'e.g., Love, Nature, Celebration' : 'e.g., Family values, Friendship, Justice'}
             value={theme}
             onChange={(e) => handleInputChange('theme', e.target.value)}
             data-testid="input-theme"
           />
         </div>
         
-        {/* Characters field removed since we're only doing lyrics */}
+        {/* Characters (for dialogue) */}
+        {contentType === 'dialogue' && (
+          <div className="space-y-3">
+            <Label htmlFor="characters" className="text-sm font-medium">
+              Characters
+            </Label>
+            <Input
+              id="characters"
+              placeholder="e.g., Father and son, Two friends, Romantic couple"
+              value={characters}
+              onChange={(e) => handleInputChange('characters', e.target.value)}
+              data-testid="input-characters"
+            />
+          </div>
+        )}
         
         {/* Situation/Context */}
         <div className="space-y-3">
           <Label htmlFor="situation" className="text-sm font-medium">
-            Situation or Setting
+            {contentType === 'lyrics' ? 'Situation or Setting' : 'Scene Context'}
           </Label>
           <Textarea
             id="situation"
-            placeholder="Describe the setting, occasion, or story behind the song..."
+            placeholder={
+              contentType === 'lyrics'
+                ? 'Describe the setting, occasion, or story behind the song...'
+                : 'Describe the scene, conflict, or situation for the dialogue...'
+            }
             value={situation}
             onChange={(e) => handleInputChange('situation', e.target.value)}
             className="min-h-[100px]"
