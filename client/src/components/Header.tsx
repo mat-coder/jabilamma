@@ -38,8 +38,8 @@ export default function Header({ credits = 25, onCreditsUpdate }: HeaderProps) {
               <Palette className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-card-foreground">IndiaGen</h1>
-              <p className="text-xs text-muted-foreground">Multilingual Content Generator</p>
+              <h1 className="text-xl font-bold text-card-foreground">Song Lyrics & Dialog Generator</h1>
+              <p className="text-xs text-muted-foreground">Multilingual Content Creator</p>
             </div>
           </div>
           

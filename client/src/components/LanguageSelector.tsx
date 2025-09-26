@@ -1,6 +1,5 @@
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import { CheckCircle2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 type Language = {
   id: string;
@@ -23,6 +22,8 @@ interface LanguageSelectorProps {
 }
 
 export default function LanguageSelector({ selectedLanguage, onLanguageSelect }: LanguageSelectorProps) {
+  const selectedLangObj = LANGUAGES.find(lang => lang.id === selectedLanguage);
+  
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
@@ -30,39 +31,42 @@ export default function LanguageSelector({ selectedLanguage, onLanguageSelect }:
         <p className="text-muted-foreground">Select the Indian language for your content generation</p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {LANGUAGES.map((language) => {
-          const isSelected = selectedLanguage === language.id;
-          
-          return (
-            <Card
-              key={language.id}
-              className={cn(
-                "relative p-6 cursor-pointer transition-all hover-elevate border",
-                isSelected
-                  ? "ring-2 ring-primary border-primary bg-primary/5"
-                  : "hover:border-primary/50"
-              )}
-              onClick={() => {
-                console.log(`Selected language: ${language.name}`);
-                onLanguageSelect(language.id);
-              }}
-              data-testid={`card-language-${language.id}`}
-            >
-              {isSelected && (
-                <CheckCircle2 className="absolute top-3 right-3 h-5 w-5 text-primary" />
-              )}
-              
-              <div className="space-y-3 text-center">
-                <div>
-                  <h3 className="font-semibold text-lg text-card-foreground">{language.name}</h3>
-                  <p className="text-2xl font-medium text-primary mt-1">{language.nativeName}</p>
+      <div className="max-w-md mx-auto space-y-3">
+        <Label className="text-sm font-medium">Language</Label>
+        <Select
+          value={selectedLanguage}
+          onValueChange={(value) => {
+            console.log(`Selected language: ${LANGUAGES.find(lang => lang.id === value)?.name}`);
+            onLanguageSelect(value);
+          }}
+        >
+          <SelectTrigger className="w-full" data-testid="select-language">
+            <SelectValue placeholder="Select a language">
+              {selectedLangObj && (
+                <div className="flex items-center gap-3">
+                  <span className="font-medium">{selectedLangObj.name}</span>
+                  <span className="text-primary font-medium">{selectedLangObj.nativeName}</span>
+                  <span className="text-muted-foreground text-sm">({selectedLangObj.description})</span>
                 </div>
-                <p className="text-sm text-muted-foreground">{language.description}</p>
-              </div>
-            </Card>
-          );
-        })}
+              )}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            {LANGUAGES.map((language) => (
+              <SelectItem 
+                key={language.id} 
+                value={language.id}
+                data-testid={`option-language-${language.id}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-medium">{language.name}</span>
+                  <span className="text-primary font-medium">{language.nativeName}</span>
+                  <span className="text-muted-foreground text-sm">({language.description})</span>
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );
