@@ -15,6 +15,7 @@ export default defineConfig({
           ),
         ]
       : []),
+      base : "/jabilamma",
   ],
   resolve: {
     alias: {
