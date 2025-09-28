@@ -15,8 +15,8 @@ export default defineConfig({
           ),
         ]
       : []),
-      base : "/jabilamma",
   ],
+  base: "/jabilamma/",
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "client", "src"),
