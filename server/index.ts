@@ -1,8 +1,30 @@
+import "dotenv/config";
+import { config } from "dotenv";
+import { join } from "path";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+// Load environment variables from the server directory
+config({ path: join(process.cwd(), "server", ".env") });
 import express, { type Request, Response, NextFunction } from "express";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import dotenv from "dotenv";
+dotenv.config();
+
+console.log("🔍 Environment variables loaded:");
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("PORT:", process.env.PORT);
+console.log("GEMINI_API_KEY exists:", !!process.env.GEMINI_API_KEY);
+console.log("GEMINI_API_KEY preview:", process.env.GEMINI_API_KEY?.substring(0, 20) + "...");
 
 const app = express();
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://your-production-domain.com'
+    : 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
@@ -36,8 +58,31 @@ app.use((req, res, next) => {
   next();
 });
 
+// Initialize Gemini client
+function initializeGemini(): any {
+  try {
+    const apiKey = process.env.GEMINI_API_KEY;
+    console.log("🔍 Initializing Gemini client...");
+    console.log("API key exists:", !!apiKey);
+
+    if (apiKey) {
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      console.log("✅ Gemini client initialized successfully");
+      return model;
+    } else {
+      console.log("❌ Gemini API key not found");
+      return null;
+    }
+  } catch (error) {
+    console.log("❌ Gemini client initialization failed:", error instanceof Error ? error.message : String(error));
+    return null;
+  }
+}
+
 (async () => {
-  const server = await registerRoutes(app);
+  const geminiClient = initializeGemini();
+  const server = await registerRoutes(app, geminiClient);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -61,11 +106,7 @@ app.use((req, res, next) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  server.listen(port, "127.0.0.1", () => {
     log(`serving on port ${port}`);
   });
 })();

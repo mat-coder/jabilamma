@@ -139,11 +139,11 @@ export default function GeneratedContent({
       </div>
       
       {/* Content */}
-      <div className="p-6">
+      <div className="p-6 bg-white">
         <div className="prose prose-sm max-w-none">
           <pre className={cn(
-            "whitespace-pre-wrap font-sans text-card-foreground",
-            "leading-relaxed text-base"
+            "whitespace-pre-wrap font-sans text-gray-900",
+            "leading-relaxed text-base p-4 bg-gray-50 rounded-lg border"
           )}>
             {content}
           </pre>

@@ -42,17 +42,24 @@ export default function GenerateButton({ onGenerate, canGenerate, creditsAvailab
         onClick={handleGenerate}
         disabled={isDisabled}
         className={cn(
-          "px-8 py-4 text-lg font-semibold min-w-[200px]",
-          isDisabled && "opacity-50 cursor-not-allowed"
+          "group px-8 py-4 text-lg font-semibold min-w-[200px]",
+          "transition-all duration-300 ease-in-out",
+          "hover:scale-105 active:scale-95",
+          "shadow-lg hover:shadow-xl",
+          isDisabled && "opacity-50 cursor-not-allowed hover:scale-100"
         )}
         data-testid="button-generate"
       >
-        {isGenerating || isLoading ? (
-          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-        ) : (
-          <Wand2 className="mr-2 h-5 w-5" />
-        )}
-        {getButtonText()}
+        <div className="flex items-center gap-2 transition-all duration-200">
+          {isGenerating || isLoading ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <Wand2 className="h-5 w-5 transition-transform duration-200 group-hover:rotate-12" />
+          )}
+          <span className="transition-all duration-200">
+            {getButtonText()}
+          </span>
+        </div>
       </Button>
       
       {!creditsAvailable && (
