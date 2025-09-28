@@ -1,0 +1,13 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Environment variables (contains sensitive data)
+.env
+.env.local
+.env.production
+client/.env
+server/.env
